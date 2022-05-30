@@ -8,7 +8,7 @@ home = Blueprint ("home", __name__)
 @home.route ("/", methods=["GET"])
 def homepage ():
 	# fetch todo items from redis
-	items = items_get_all ()
+	items, data = items_get_all ()
 
 	# render home template with items table
-	return render_template ("index.html", items=items)
+	return render_template ("index.html", items=items, values=data)
