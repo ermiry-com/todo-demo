@@ -11,6 +11,7 @@ sudo docker run \
   -v /home/ermiry/Documents/projects/todo-demo:/home/todo \
   -e RUNTIME=development \
   -e PORT=5000 \
+  -e TIME_SERVICE_ADDRESS=time:5001/api/time \
   ermiry/todo-demo:development /bin/bash
 ```
 
