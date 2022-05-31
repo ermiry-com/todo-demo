@@ -1,7 +1,10 @@
+import json
+import requests
 import traceback
 
 from redis_om import NotFoundError
 
+import config
 from errors import SERVICE_ERROR_NONE
 from errors import SERVICE_ERROR_NOT_FOUND
 from errors import SERVICE_ERROR_SERVER_ERROR
@@ -11,20 +14,39 @@ from models.item import Item
 
 def items_get_all ():
 	items = Item.find ().all ()
-	print (items)
-	return items
+	# print (items)
+
+	# fetch data from dedicated service
+	data = None
+	response = requests.get (f"http://{config.TIME_SERVICE_ADDRESS}/data")
+	if (response.status_code == SERVICE_ERROR_NONE):
+		print (response.text)
+		data = json.loads (response.text)
+
+	return items, data
 
 def item_create (data: dict):
-	item = Item (
-		task=data["description"],
-		status=ITEM_STATUS_TODO
-	)
+	error = SERVICE_ERROR_NONE
 
-	item.save ()
-	item_id = item.pk
-	print (item_id)
+	try:
+		item = Item (
+			task=data["description"],
+			status=ITEM_STATUS_TODO
+		)
 
-	return item_id
+		item.save ()
+		item_id = item.pk
+		# print (item_id)
+
+		# make request to time service
+		response = requests.post (f"http://{config.TIME_SERVICE_ADDRESS}/data")
+		print (response)
+
+	except:
+		traceback.print_exc ()
+		error = SERVICE_ERROR_SERVER_ERROR
+
+	return error, item_id
 
 def item_update (item_pk: str, data: dict):
 	error = SERVICE_ERROR_NONE

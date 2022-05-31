@@ -13,7 +13,7 @@ items = Blueprint ("items", __name__)
 @items.route ("/api/todo/items/create", methods=["POST"])
 def item_create_handler ():
 	data = request.get_json ()
-	item_id = item_create (data)
+	error, item_id = item_create (data)
 	return jsonify ({"oki": "doki"})
 
 # PUT /api/todo/items/:item_id/update
